@@ -85,8 +85,26 @@ static void handle_syscall(trapframe_t* tf)
   tf->epc += 4;
 }
 
+/* RetTag: begin */
+static void handle_rocc_interrupt(trapframe_t* tf)
+{
+  panic("[RoCC Interrupt] Authentication Failure"); 
+}
+/* RetTag: end */
+
+
 static void handle_interrupt(trapframe_t* tf)
 {
+  /* RetTag: begin */
+  typedef void (*trap_handler1)(trapframe_t*);
+  const static trap_handler1 trap_handlers1[] = {
+    [CAUSE_FETCH_PAGE_FAULT] = handle_rocc_interrupt,
+  };
+
+  trap_handler1 f = (void*)pa2kva(trap_handlers1[tf->cause&0x0ff]);
+
+  f(tf);
+  /* RetTag: end */  
   clear_csr(sip, SIP_SSIP);
 }
 
