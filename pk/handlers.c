@@ -84,6 +84,12 @@ static void handle_syscall(trapframe_t* tf)
                            tf->gpr[14], tf->gpr[15], tf->gpr[17]);
   tf->epc += 4;
 }
+/* RetTag: begin */
+static void handle_rocc_interrupt(trapframe_t* tf)
+{
+  panic("[RoCC Interrupt] Authentication Failure"); 
+}
+/* RetTag: end */
 
 static void handle_interrupt(trapframe_t* tf)
 {
@@ -99,12 +105,7 @@ static void handle_interrupt(trapframe_t* tf)
   /* RetTag: end */  
   clear_csr(sip, SIP_SSIP);
 }
-/* RetTag: begin */
-static void handle_rocc_interrupt(trapframe_t* tf)
-{
-  panic("[RoCC Interrupt] Authentication Failure"); 
-}
-/* RetTag: end */
+
 
 void handle_trap(trapframe_t* tf)
 {
