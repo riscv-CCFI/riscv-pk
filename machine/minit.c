@@ -24,7 +24,12 @@ void* kernel_end;
 static void mstatus_init()
 {
   uintptr_t mstatus = 0;
-
+	
+	
+  /* RetTag: begin */
+  mstatus |= MSTATUS_XS;
+  /* RetTag: end */
+  
   // Enable FPU
   if (supports_extension('F'))
     mstatus |= MSTATUS_FS;
@@ -41,8 +46,10 @@ static void mstatus_init()
   if (supports_extension('U'))
     write_csr(mcounteren, -1);
 
-  // Enable software interrupts
-  write_csr(mie, MIP_MSIP);
+  /* RetTag: begin */
+  // Enable software interrupts and RoCC interrupts  
+  write_csr(mie, MIP_MSIP | MIP_SGEIP);
+  /* RetTag: end */
 
   // Disable paging
   if (supports_extension('S'))
@@ -55,7 +62,10 @@ static void delegate_traps()
   if (!supports_extension('S'))
     return;
 
-  uintptr_t interrupts = MIP_SSIP | MIP_STIP | MIP_SEIP;
+   /* RetTag: begin */
+  uintptr_t interrupts = MIP_SSIP | MIP_STIP | MIP_SEIP | MIP_SGEIP;
+  /* RetTag: end */
+
   uintptr_t exceptions =
     (1U << CAUSE_MISALIGNED_FETCH) |
     (1U << CAUSE_FETCH_PAGE_FAULT) |
